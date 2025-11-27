@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Chatbot Simples com Voz</title>
+<style>
+    body {
+        font-family: Arial;
+        background: #222121;
+        color: white;
+        padding: 20px;
+    }
+    .chatbox {
+        background: rgba(240, 70, 70, 0.775);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(177, 22, 22, 0.783);
+        max-width: 400px;
+        margin: auto;
+        text-align: center;
+    }
+    .img {
+    max-width: 30vw;
+    height: auto;
+    float: right;
+    margin: 1vw;
+    border-radius: 5px;
+}
+.txt{
+    color: white;
+    font-size: 20px;
+    font-size: 16px;
+    
+
+}
+   
+    button {
+        margin-top: 10px;
+        padding: 10px;
+        width: 50%;
+        cursor: pointer;
+        background: #dfcdcd;
+        color: rgb(12, 11, 11);
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<div class="chatbox">
+    <h2>Chatbot por Voz</h2>
+    <img src="img.png" class="img">
+    <button onclick="ouvir()">Falar Agora</button>
+</div>
+<p id="respostaTexto" class="txt"></p>
+
+
+<script>
+const perguntas = [
+    "o que é considerado um bebê atermo",
+    "quais os cuidados imediatos e mediatos com o recém nascido",
+    "o que é o boletim de apgar",
+    "quais os cuidados com o rn",
+    "o que deve ter na pulseira do recém nascido"
+];
+
+const respostas = [
+    "Um bebê atermo é o que nasce entre 37 semanas e 41 semanas e 6 dias de gestação.",
+    "Cuidados imediatos ao nascer incluem secar, aquecer, verificar respiração, cortar cordão, pulseira de identificação, vitamina K, colírio e contato pele a pele. Nos cuidados mediatos, fazem exames, sinais vitais, testes do pezinho, olhinho, orelhinha e coraçãozinho, além de manter aquecido e apoiar amamentação.",
+    "O boletim de Apgar é uma nota dada ao bebê com 1 e 5 minutos de vida para avaliar respiração, coração, cor, tônus e resposta a estímulos. Vai de zero a dez.",
+    "Os cuidados com o recém nascido incluem manter aquecido, amamentar em livre demanda, cuidar do coto umbilical, colocar para dormir de barriga para cima e acompanhar vacinas e testes obrigatórios.",
+    "Na pulseira deve ter nome da mãe, data e hora do nascimento, sexo do bebê, número de identificação e nome do bebê se já tiver."
+];
+
+
+let respondidas = [];
+
+function falar(texto) {
+    const discurso = new SpeechSynthesisUtterance(texto);
+    discurso.lang = "pt-BR";
+    discurso.rate = 1;
+    window.speechSynthesis.speak(discurso);
+    falar(respostas[i]);
+}
+function falarResposta(texto) {
+    document.getElementById("respostaTexto").innerText = texto;
+}
+
+
+function ouvir() {
+    const reconhecer =
+        new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    reconhecer.lang = "pt-BR";
+    reconhecer.start();
+
+    reconhecer.onresult = function (event) {
+        const textoFalado = event.results[0][0].transcript.toLowerCase();
+        console.log("Usuário disse:", textoFalado);
+
+        for (let i = 0; i < perguntas.length; i++) {
+            const pergunta = perguntas[i].toLowerCase();
+
+            const jaRespondida = respondidas.includes(i);
+
+    
+            const palavras = pergunta.split(" ");
+            let contador = 0;
+            palavras.forEach(p => {
+                if (textoFalado.includes(p)) contador++;
+            });
+
+            
+            if (contador >= 6) {
+
+                if (jaRespondida) {
+                    if (
+                        textoFalado.includes("de novo") ||
+                        textoFalado.includes("repete") ||
+                        textoFalado.includes("novamente")
+                    ) {
+                        falar(respostas[i]);
+                        return;
+                    } else {
+                        falar("Essa pergunta já foi respondida. Diga 'repete' se quiser ouvir de novo.");
+                        return;
+                    }
+                }
+
+                // marca como respondida e responde
+                respondidas.push(i);
+                document.getElementById("respostaTexto").innerText = respostas[i];
+                falar(respostas[i]);
+                return;
+            }
+        }
+
+        falar("Não entendi. Pode repetir?");
+    };
+
+    function falarResposta(texto) {
+    document.getElementById("respostaTexto").innerText = texto;
+}
+
+}
+</script>
+
+</body>
+</html>
